@@ -39,7 +39,7 @@
                                 <constraints>
                                     <constraint firstItem="ajY-Hg-ymp" firstAttribute="centerY" secondItem="iUz-lj-v6O" secondAttribute="centerY" id="Gc3-nO-WK5"/>
                                     <constraint firstAttribute="height" constant="60" id="pgQ-L7-Ynx"/>
-                                    <constraint firstItem="iUz-lj-v6O" firstAttribute="centerY" secondItem="9sc-0i-jVT" secondAttribute="centerY" constant="5" id="qbm-N6-QgZ"/>
+                                    <constraint firstItem="iUz-lj-v6O" firstAttribute="centerY" secondItem="9sc-0i-jVT" secondAttribute="centerY" constant="5" identifier="TitleCenterY" id="qbm-N6-QgZ"/>
                                     <constraint firstAttribute="trailing" secondItem="ajY-Hg-ymp" secondAttribute="trailing" constant="8" id="qp1-7X-8pY"/>
                                     <constraint firstItem="iUz-lj-v6O" firstAttribute="centerX" secondItem="9sc-0i-jVT" secondAttribute="centerX" id="wVy-PO-jH1"/>
                                 </constraints>
@@ -76,6 +76,7 @@
                     </view>
                     <connections>
                         <outlet property="buttonMenu" destination="ajY-Hg-ymp" id="7TY-cV-VpO"/>
+                        <outlet property="menuHeightContraint" destination="pgQ-L7-Ynx" id="MmT-Ow-HUR"/>
                         <outlet property="tableView" destination="WkH-5E-zrb" id="Z7W-5e-Dg3"/>
                         <outlet property="titleLabel" destination="iUz-lj-v6O" id="fXd-Xz-172"/>
                     </connections>
