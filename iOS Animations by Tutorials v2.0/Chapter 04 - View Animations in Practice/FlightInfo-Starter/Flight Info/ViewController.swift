@@ -51,6 +51,11 @@ class ViewController: UIViewController {
   @IBOutlet var statusBanner: UIImageView!
   
   var snowView: SnowView!
+    
+    enum AnimationDirection: Int {
+        case Positive = 1
+        case Negative = -1
+    }
   
   //MARK: view controller methods
   
@@ -69,28 +74,107 @@ class ViewController: UIViewController {
     view.addSubview(snowClipView)
     
     //start rotating the flights
-    changeFlightDataTo(londonToParis)
+    changeFlightDataTo(londonToParis, animated: true)
   }
   
   //MARK: custom methods
   
-  func changeFlightDataTo(data: FlightData) {
+    func changeFlightDataTo(data: FlightData, animated: Bool = false) {
     
     // populate the UI with the next flight's data
     summary.text = data.summary
-    flightNr.text = data.flightNr
-    gateNr.text = data.gateNr
-    departingFrom.text = data.departingFrom
-    arrivingTo.text = data.arrivingTo
-    flightStatus.text = data.flightStatus
-    bgImageView.image = UIImage(named: data.weatherImageName)
-    snowView.hidden = !data.showWeatherEffects
+
+
+        if animated {
+            let direction: AnimationDirection = data.isTakingOff ? .Positive : .Negative
+
+            let offsetDeparting = CGPoint(x: CGFloat(direction.rawValue * 80), y: 0.0)
+            moveLabel(departingFrom, text: data.departingFrom, offset: offsetDeparting)
+            
+            let offsetArriveing = CGPoint(x: 0.0, y: CGFloat(direction.rawValue*50))
+                moveLabel(arrivingTo, text: data.arrivingTo, offset: offsetArriveing)
+            
+            
+            cubeTransition(label: flightNr, text: data.flightNr, direction: direction)
+            cubeTransition(label: gateNr, text: data.gateNr, direction: direction)
+            fadeInageVIew(bgImageView, toImage: UIImage(named: data.weatherImageName)!, showEffects: data.showWeatherEffects)
+        } else {
+            bgImageView.image = UIImage(named: data.weatherImageName)
+            snowView.hidden = !data.showWeatherEffects
+            
+            flightNr.text = data.flightNr
+            gateNr.text = data.gateNr
+            
+            departingFrom.text = data.departingFrom
+            arrivingTo.text = data.arrivingTo
+            flightStatus.text = data.flightStatus
+        }
+    
     
     // schedule next flight
     delay(seconds: 3.0) {
-      self.changeFlightDataTo(data.isTakingOff ? parisToRome : londonToParis)
+      self.changeFlightDataTo(data.isTakingOff ? parisToRome : londonToParis, animated: true)
     }
   }
   
+    func fadeInageVIew(imageVIew:UIImageView, toImage:UIImage, showEffects:Bool) {
+        UIView.transitionWithView(imageVIew, duration: 1.0, options: [.TransitionCrossDissolve], animations: {
+            imageVIew.image = toImage
+            }, completion: nil)
+        
+        UIView.animateWithDuration(1.0, delay: 0.0, options: [.CurveEaseOut], animations: {
+            self.snowView.alpha = showEffects ? 1.0 : 0.0
+            }, completion: nil)
+    }
+    
+    func cubeTransition(label label: UILabel, text: String, direction: AnimationDirection) {
+        let auxLAbel = UILabel(frame: label.frame)
+        auxLAbel.text = text
+        auxLAbel.font = label.font
+        auxLAbel.textAlignment = label.textAlignment
+        auxLAbel.textColor = label.textColor
+        auxLAbel.backgroundColor = label.backgroundColor
+        
+        let auxLabelOffset = CGFloat(direction.rawValue) * label.frame.size.height/2.0
+        auxLAbel.transform = CGAffineTransformConcat(CGAffineTransformMakeScale(1.0, 0.1),CGAffineTransformMakeTranslation(0.0, auxLabelOffset))
+        label.superview!.addSubview(auxLAbel)
+        
+        UIView.animateWithDuration(0.5, delay: 0.0, options: .CurveEaseOut, animations: {
+            auxLAbel.transform = CGAffineTransformIdentity
+            auxLAbel.transform = CGAffineTransformConcat(CGAffineTransformMakeScale(1.0, 0.1),CGAffineTransformMakeTranslation(0.0, auxLabelOffset))
+            }, completion: {_ in
+                label.text = auxLAbel.text
+                label.transform = CGAffineTransformIdentity
+                auxLAbel.removeFromSuperview()
+        })
+    }
+    
+    func moveLabel(label:UILabel, text:String, offset:CGPoint) {
+        let auxLabel = UILabel(frame: label.frame)
+        auxLabel.text = text
+        auxLabel.font = label.font
+        auxLabel.textAlignment = label.textAlignment
+        auxLabel.textColor = label.textColor
+        auxLabel.backgroundColor = UIColor.clearColor()
+        
+        auxLabel.transform = CGAffineTransformMakeTranslation(offset.x, offset.y)
+        auxLabel.alpha = 0
+        view.addSubview(auxLabel)
+        
+        UIView.animateWithDuration(0.5, delay: 0.0, options: .CurveEaseIn, animations: {
+            label.transform = CGAffineTransformMakeTranslation(offset.x, offset.y)
+            label.alpha = 0.0
+            }, completion: nil)
+        
+        UIView.animateWithDuration(0.25, delay: 0.1, options: .CurveEaseIn, animations: {
+            auxLabel.transform = CGAffineTransformIdentity
+            auxLabel.alpha = 1.0
+            }, completion: {_ in
+                auxLabel.removeFromSuperview()
+                label.text = text
+                label.alpha = 1.0
+                label.transform = CGAffineTransformIdentity
+        })
+    }
   
 }
