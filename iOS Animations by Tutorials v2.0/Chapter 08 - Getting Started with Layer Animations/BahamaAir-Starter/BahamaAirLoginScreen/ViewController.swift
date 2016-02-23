@@ -84,6 +84,7 @@ class ViewController: UIViewController {
   override func viewWillAppear(animated: Bool) {
     super.viewWillAppear(animated)
     
+    username.center.x -= view.bounds.width
     password.center.x -= view.bounds.width
 
     cloud1.alpha = 0.0
@@ -93,6 +94,9 @@ class ViewController: UIViewController {
     
     loginButton.center.y += 30.0
     loginButton.alpha = 0.0
+    delay(seconds: 5.0, completion: {
+        print("debug")
+    })
   }
   
   override func viewDidAppear(animated: Bool) {
@@ -102,14 +106,17 @@ class ViewController: UIViewController {
     flyRight.fromValue = -view.bounds.size.width/2
     flyRight.toValue = view.bounds.size.width/2
     flyRight.duration = 0.5
+    flyRight.fillMode = kCAFillModeBoth
+//    flyRight.removedOnCompletion = false
     
     heading.layer.addAnimation(flyRight, forKey: nil)
     flyRight.beginTime = CACurrentMediaTime() + 0.3
     username.layer.addAnimation(flyRight, forKey: nil)
+    username.center.x = view.bounds.width/2
 
-    UIView.animateWithDuration(0.5, delay: 0.4, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.0, options: [], animations: {
-      self.password.center.x += self.view.bounds.width
-    }, completion: nil)
+    flyRight.beginTime = CACurrentMediaTime() + 0.4
+    password.layer.addAnimation(flyRight, forKey: nil)
+    password.center.x = view.bounds.width/2
 
     UIView.animateWithDuration(0.5, delay: 0.5, options: [], animations: {
       self.cloud1.alpha = 1.0
