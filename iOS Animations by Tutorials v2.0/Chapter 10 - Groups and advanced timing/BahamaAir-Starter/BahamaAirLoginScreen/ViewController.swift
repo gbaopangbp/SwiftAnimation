@@ -95,9 +95,6 @@ class ViewController: UIViewController {
   override func viewWillAppear(animated: Bool) {
     super.viewWillAppear(animated)
     
-    loginButton.center.y += 30.0
-    loginButton.alpha = 0.0
-    
     username.layer.position.x -= view.bounds.width
     password.layer.position.x -= view.bounds.width
 
@@ -144,10 +141,26 @@ class ViewController: UIViewController {
     fadeIn.beginTime = CACurrentMediaTime() + 1.1
     cloud4.layer.addAnimation(fadeIn, forKey: nil)
     
-    UIView.animateWithDuration(0.5, delay: 0.5, usingSpringWithDamping: 0.5, initialSpringVelocity: 0.0, options: [], animations: {
-        self.loginButton.center.y -= 30.0
-        self.loginButton.alpha = 1.0
-    }, completion: nil)
+    let animationGroup = CAAnimationGroup()
+    animationGroup.beginTime = CACurrentMediaTime() + 0.5
+    animationGroup.duration = 0.5
+    animationGroup.fillMode = kCAFillModeBoth
+    animationGroup.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseIn)
+    
+    let scaleDown = CABasicAnimation(keyPath: "transform.scale")
+    scaleDown.fromValue = 3.5
+    scaleDown.toValue = 1.0
+    
+    let rotate = CABasicAnimation(keyPath: "transform.rotation");rotate.fromValue = CGFloat(M_PI_4)
+    rotate.toValue = 0.0
+    
+    let fade = CABasicAnimation(keyPath: "opacity")
+    fade.fromValue = 0.0
+    fade.toValue = 1.0
+    
+    animationGroup.animations = [scaleDown,rotate,fade]
+    loginButton.layer.addAnimation(animationGroup, forKey: nil)
+    
 
     animateCloud(cloud1.layer)
     animateCloud(cloud2.layer)
@@ -158,6 +171,11 @@ class ViewController: UIViewController {
     flyLeft.fromValue = info.layer.position.x + view.frame.size.width
     flyLeft.toValue = info.layer.position.x
     flyLeft.duration = 5.0
+    flyLeft.repeatCount = 2.5
+    flyLeft.autoreverses = true
+    flyLeft.speed = 2.0
+    info.layer.speed = 2.0
+    view.layer.speed = 2.0
     info.layer.addAnimation(flyLeft, forKey: "infoappear")
     
     let fadeLabelIn = CABasicAnimation(keyPath: "opacity")
