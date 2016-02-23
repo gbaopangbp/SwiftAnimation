@@ -302,10 +302,11 @@ class ViewController: UIViewController {
         let layer = anim.valueForKey("layer") as? CALayer
         anim.setValue(nil, forKey: "layer")
         
-        let pulse = CABasicAnimation(keyPath: "transform.scale")
+        let pulse = CASpringAnimation(keyPath: "transform.scale")
         pulse.fromValue = 1.25
         pulse.toValue = 1.0
-        pulse.duration = 0.25
+        pulse.duration = pulse.settlingDuration
+        pulse.damping = 7.0
         layer?.addAnimation(pulse, forKey: nil)
       }
       
@@ -329,4 +330,27 @@ extension ViewController: UITextFieldDelegate {
     print(info.layer.animationKeys())
     info.layer.removeAnimationForKey("infoappear")
   }
+    
+    func textFieldDidEndEditing(textField: UITextField) {
+        if textField.text?.characters.count < 5 {
+            let jump = CASpringAnimation(keyPath: "position.y")
+            jump.fromValue = textField.layer.position.y + 1.0
+            jump.toValue = textField.layer.position.y;
+            jump.duration = jump.settlingDuration
+            jump.initialVelocity = 100.0
+            jump.mass = 10
+            jump.stiffness = 1500
+            textField.layer.addAnimation(jump, forKey: nil)
+        }
+        
+        textField.layer.borderWidth = 3.0
+        textField.layer.borderColor = UIColor.clearColor().CGColor
+        let flash = CASpringAnimation(keyPath: "borderColor")
+        flash.damping = 7.0
+        flash.stiffness = 200.0
+        flash.fromValue = UIColor(red: 0.96, green: 0.27, blue: 0.0,alpha: 1.0).CGColor
+        flash.toValue = UIColor.clearColor().CGColor
+        flash.duration = flash.settlingDuration
+        textField.layer.addAnimation(flash, forKey: nil)
+    }
 }

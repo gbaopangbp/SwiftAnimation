@@ -302,7 +302,7 @@ class ViewController: UIViewController {
         let layer = anim.valueForKey("layer") as? CALayer
         anim.setValue(nil, forKey: "layer")
         
-        let pulse = CABasicAnimation(keyPath: "transform.scale")
+        let pulse = CASpringAnimation(keyPath: "transform.scale")
         pulse.fromValue = 1.25
         pulse.toValue = 1.0
         pulse.duration = 0.25
