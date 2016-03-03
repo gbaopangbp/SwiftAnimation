@@ -208,6 +208,18 @@ class ViewController: UIViewController {
     let tintColor = UIColor(red: 0.85, green: 0.83, blue: 0.45, alpha: 1.0)
     tintBackgroundColor(layer: loginButton.layer, toColor: tintColor)
     roundCorners(layer: loginButton.layer, toRadius: 25.0)
+    
+    let balloon = CALayer()
+    balloon.contents = UIImage(named: "balloon")?.CGImage
+    balloon.frame = CGRect(x: -50.0, y: 0.0, width: 50.0, height: 65.0)
+    view.layer.insertSublayer(balloon, below: username.layer)
+    
+    let flight = CAKeyframeAnimation(keyPath: "position")
+    flight.duration = 2.0
+    flight.values = [CGPoint(x: -50.0, y: 0.0), CGPoint(x: view.frame.width + 50.0, y: 160.0), CGPoint(x: -50.0, y: loginButton.center.y)].map{NSValue(CGPoint:$0)}
+    flight.keyTimes = [0.0, 0.5, 1.0]
+    balloon.addAnimation(flight, forKey: nil)
+    balloon.position = CGPoint(x: -50.0, y: loginButton.center.y)
   }
 
   func showMessage(index index: Int) {
@@ -241,6 +253,13 @@ class ViewController: UIViewController {
   }
 
   func resetForm() {
+    let wobble = CAKeyframeAnimation(keyPath: "transform.rotation")
+    wobble.duration = 0.25
+    wobble.repeatCount = 4
+    wobble.values = [0.0, -M_PI_4/4, 0.0, M_PI_4/4, 0.0]
+    wobble.keyTimes = [0.0, 0.25, 0.5, 075, 1.0]
+    heading.layer.addAnimation(wobble, forKey: nil)
+    
     UIView.transitionWithView(status, duration: 0.2, options: .TransitionFlipFromTop, animations: {
       self.status.hidden = true
       self.status.center = self.statusPosition
