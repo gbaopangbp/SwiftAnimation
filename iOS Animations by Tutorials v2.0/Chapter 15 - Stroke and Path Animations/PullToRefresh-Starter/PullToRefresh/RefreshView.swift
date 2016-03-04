@@ -52,6 +52,21 @@ class RefreshView: UIView, UIScrollViewDelegate {
     imgView.contentMode = .ScaleAspectFill
     imgView.clipsToBounds = true
     addSubview(imgView)
+    
+    ovalShapeLayer.strokeColor = UIColor.whiteColor().CGColor
+    ovalShapeLayer.fillColor = UIColor.clearColor().CGColor
+    ovalShapeLayer.lineWidth = 4.0
+    ovalShapeLayer.lineDashPattern = [2, 3]
+    let refreshRadius = frame.size.height/2*0.8
+    ovalShapeLayer.path = UIBezierPath(ovalInRect: CGRect(x: frame.size.width/2 - refreshRadius, y: frame.size.height/2 - refreshRadius, width: 2 * refreshRadius, height: 2 * refreshRadius)).CGPath
+    layer.addSublayer(ovalShapeLayer)
+    
+    let airplaneImage = UIImage(named: "airplane.png")!
+    airplaneLayer.contents = airplaneImage.CGImage
+    airplaneLayer.bounds = CGRect(x: 0.0, y: 0.0, width: airplaneImage.size.width, height: airplaneImage.size.height)
+    airplaneLayer.position = CGPoint(x: frame.size.width/2 + frame.size.height/2*0.8, y: frame.size.height/2)
+    layer.addSublayer(airplaneLayer)
+    airplaneLayer.opacity = 0.0
   }
   
   required init(coder aDecoder: NSCoder) {
@@ -87,6 +102,36 @@ class RefreshView: UIView, UIScrollViewDelegate {
       self.scrollView!.contentInset = newInsets
     })
     
+    let strokeStartAnimation = CABasicAnimation(keyPath: "strokeStart")
+    strokeStartAnimation.fromValue = -0.5
+    strokeStartAnimation.toValue = 1.0
+
+    let strokenendAnimation = CABasicAnimation(keyPath: "strokeEnd")
+    strokenendAnimation.fromValue = 0.0
+    strokenendAnimation.toValue = 1.0
+    
+    let strokeAnimationGroup = CAAnimationGroup()
+    strokeAnimationGroup.duration = 1.5
+    strokeAnimationGroup.repeatCount = 5.0
+    strokeAnimationGroup.animations = [strokeStartAnimation, strokenendAnimation]
+    ovalShapeLayer.addAnimation(strokeAnimationGroup, forKey: nil)
+    
+    let flightAnimation = CAKeyframeAnimation(keyPath: "position")
+    flightAnimation.path = ovalShapeLayer.path
+    flightAnimation.calculationMode = kCAAnimationPaced
+//    flightAnimation.rotationMode = kCAAnimationRotateAuto
+    
+    let airplaneOrientationAnimation = CABasicAnimation(keyPath: "transform.rotation")
+    airplaneOrientationAnimation.fromValue = 0
+    airplaneOrientationAnimation.toValue = 2 * M_PI
+    
+    let flightAnimationGroup = CAAnimationGroup()
+    flightAnimationGroup.duration = 1.5
+    flightAnimationGroup.repeatDuration = 5.0
+    flightAnimationGroup.animations = [flightAnimation,airplaneOrientationAnimation]
+    airplaneLayer.addAnimation(flightAnimationGroup, forKey: nil)
+    
+   
   }
   
   func endRefreshing() {
@@ -103,7 +148,8 @@ class RefreshView: UIView, UIScrollViewDelegate {
   }
   
   func redrawFromProgress(progress: CGFloat) {
-    
+//    ovalShapeLayer.strokeEnd = progress
+    airplaneLayer.opacity = Float(progress)
   }
   
 }
