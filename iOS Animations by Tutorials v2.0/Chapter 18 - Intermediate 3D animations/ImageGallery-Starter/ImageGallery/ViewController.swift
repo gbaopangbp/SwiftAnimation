@@ -37,6 +37,10 @@ class ViewController: UIViewController {
     
     view.backgroundColor = UIColor.blackColor()
     navigationItem.leftBarButtonItem = UIBarButtonItem(title: "info", style: .Done, target: self, action: Selector("info"))
+    
+    var perspective = CATransform3DIdentity
+    perspective.m34 = -1/250.0
+    view.layer.sublayerTransform = perspective
   }
   
   func info() {
@@ -47,12 +51,63 @@ class ViewController: UIViewController {
   
   override func viewDidAppear(animated: Bool) {
     super.viewDidAppear(animated)
-    
+    for image in images {
+        image.layer.anchorPoint.y = 0.0
+        image.frame = view.bounds
+        view.addSubview(image)
+        image.didSelect = selectImage
+        
+        navigationItem.title = images.last?.title
+    }
   }
   
   @IBAction func toggleGallery(sender: AnyObject) {
+    var imageYOffset:CGFloat = 50.0
     
+    for subview in view.subviews {
+        if let image = subview as? ImageViewCard {
+            var imageTransform = CATransform3DIdentity
+            
+            imageTransform = CATransform3DTranslate(imageTransform, 0.0, imageYOffset, 0.0)
+            
+            imageTransform = CATransform3DScale(imageTransform, 0.95, 0.6, 1.0)
+            
+            imageTransform = CATransform3DRotate(imageTransform, CGFloat(M_PI_4/2), -1.0, 0.0, 0.0)
+            
+            let animation = CABasicAnimation(keyPath: "transform")
+            animation.fromValue = NSValue(CATransform3D:image.layer.transform)
+            animation.fromValue = NSValue(CATransform3D:imageTransform)
+            animation.duration = 0.33
+            image.layer.addAnimation(animation, forKey: nil)
+
+            
+            
+            image.layer.transform = imageTransform
+            imageYOffset += view.frame.height / CGFloat(images.count)
+        }
+    }
     
   }
+    
+    func selectImage(selectedImage: ImageViewCard) {
+        for subview in view.subviews {
+            if let image = subview as? ImageViewCard {
+                if image === selectedImage {
+                    UIView.animateWithDuration(0.33, animations: {
+                        image.layer.transform = CATransform3DIdentity
+                        }, completion: {_ in
+                           self.view.bringSubviewToFront(image)
+                    })
+                } else {
+                    UIView.animateWithDuration(0.33, animations:{
+                        image.alpha = 0.0
+                        }, completion: { _ in
+                        image.alpha = 1.0
+                            image.layer.transform = CATransform3DIdentity
+                    })
+                }
+            }
+        }
+    }
   
 }
