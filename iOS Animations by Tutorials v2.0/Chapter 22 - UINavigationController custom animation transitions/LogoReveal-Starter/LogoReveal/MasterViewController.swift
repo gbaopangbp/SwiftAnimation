@@ -37,10 +37,12 @@ func delay(seconds seconds: Double, completion:()->()) {
 class MasterViewController: UIViewController {
   
   let logo = RWLogoLayer.logoLayer()
+    let transtion = RevealAnimator()
   
   override func viewDidLoad() {
     super.viewDidLoad()
     title = "Start"
+    navigationController?.delegate = self
     
   }
   
@@ -65,4 +67,11 @@ class MasterViewController: UIViewController {
     performSegueWithIdentifier("details", sender: nil)
   }
   
+}
+
+extension MasterViewController: UINavigationControllerDelegate {
+    func navigationController(navigationController: UINavigationController, animationControllerForOperation operation: UINavigationControllerOperation, fromViewController fromVC: UIViewController, toViewController toVC: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        transtion.operation = operation
+        return transtion
+    }
 }

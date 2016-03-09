@@ -32,12 +32,13 @@ class DetailViewController: UITableViewController, UINavigationControllerDelegat
     
     title = "Pack List"
     tableView.rowHeight = 54.0
-    
+    maskLayer.position = CGPoint(x: view.layer.bounds.size.width/2, y: view.layer.bounds.size.height/2)
+    view.layer.mask = maskLayer
   }
   
   override func viewDidAppear(animated: Bool) {
     super.viewDidAppear(animated)
-    
+    view.layer.mask = nil
   }
   
   // MARK: Table View methods
