@@ -8,11 +8,34 @@
 
 import UIKit
 
-class RevealAnimator: NSObject,UIViewControllerAnimatedTransitioning {
+class RevealAnimator: UIPercentDrivenInteractiveTransition,UIViewControllerAnimatedTransitioning {
     let animationDuration = 2.0
     var operation : UINavigationControllerOperation = .Push
     weak var storedContext: UIViewControllerContextTransitioning?
-    
+    var interactive = false
+
+    func handlePan(recognizer: UIPanGestureRecognizer){
+        let translation = recognizer.translationInView( recognizer.view!.superview!)
+        var progress: CGFloat = abs(translation.x / 200.0)
+        progress = min(max(progress, 0.01), 0.99)
+        
+        switch recognizer.state {
+        case .Changed:
+            updateInteractiveTransition(progress)
+        case .Cancelled, .Ended:
+            let transitionLayer = storedContext!.containerView()!.layer
+        transitionLayer.beginTime = CACurrentMediaTime()
+        if progress < 0.5 {
+            completionSpeed = -1.0
+            cancelInteractiveTransition()
+        } else {
+            completionSpeed = 1.0
+            finishInteractiveTransition()
+            }
+        default:
+            break
+        }
+    }
     
     func transitionDuration(transitionContext: UIViewControllerContextTransitioning?) -> NSTimeInterval {
         return animationDuration

@@ -40,7 +40,12 @@ class ViewController: UIViewController {
   }
 
   @IBAction func actionAddItem(sender: AnyObject) {
-    
+    UIView.animateWithDuration(1.0, delay: 0.0, usingSpringWithDamping: 0.33, initialSpringVelocity: 0.0, options: [], animations: {
+        self.plusButton.transform = CGAffineTransformRotate( self.plusButton.transform, CGFloat(-M_PI_2))
+        self.plusButton.layer.cornerRadius = 62.5
+        self.plusButton.layer.borderWidth = 2.0
+        self.plusButton.layer.borderColor = UIColor.grayColor().CGColor
+        }, completion: nil)
     
   }
   
