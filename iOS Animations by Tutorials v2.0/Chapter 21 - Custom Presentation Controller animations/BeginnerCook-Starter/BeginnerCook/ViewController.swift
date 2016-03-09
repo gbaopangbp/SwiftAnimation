@@ -29,12 +29,16 @@ class ViewController: UIViewController {
   @IBOutlet var listView: UIScrollView!
   @IBOutlet var bgImage: UIImageView!
   var selectedImage: UIImageView?
+    
+    let transition = PopAnimator()
   
   //MARK: UIViewController
   
   override func viewDidLoad() {
     super.viewDidLoad()
-    
+    transition.dismissCompletion = {
+        self.selectedImage?.hidden = false
+    }
   }
   
   override func viewWillAppear(animated: Bool) {
@@ -45,6 +49,15 @@ class ViewController: UIViewController {
       setupList()
     }
   }
+    
+    override func viewWillTransitionToSize(size: CGSize, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransitionToSize(size, withTransitionCoordinator: coordinator)
+        
+        coordinator.animateAlongsideTransition({contex in
+            self.bgImage.alpha = (size.width > size.height) ? 0.25 : 0.55
+            self.positionListItems()
+            }, completion: nil)
+    }
   
   override func preferredStatusBarStyle() -> UIStatusBarStyle {
     return .LightContent
@@ -106,6 +119,21 @@ class ViewController: UIViewController {
     //present details view controller
     let herbDetails = storyboard!.instantiateViewControllerWithIdentifier("HerbDetailsViewController") as! HerbDetailsViewController
     herbDetails.herb = selectedHerb
+    herbDetails.transitioningDelegate = self
     presentViewController(herbDetails, animated: true, completion: nil)
   }
+}
+
+extension ViewController: UIViewControllerTransitioningDelegate {
+    func animationControllerForPresentedController(presented: UIViewController, presentingController presenting: UIViewController, sourceController source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        transition.originFrame = selectedImage!.superview!.convertRect(selectedImage!.frame, toView: nil)
+        transition.presenting = true
+        selectedImage?.hidden = true
+        return transition
+    }
+    
+    func animationControllerForDismissedController(dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        transition.presenting = false
+        return transition
+    }
 }
